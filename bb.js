@@ -6,6 +6,7 @@ window.BrickBreaker = (function() {
     // 60 fps = 1 frame / 60 seconds = 0.016666 seconds = 16 milliseconds
     this.frame_length = 16
     this.ball      = new Ball(10, { x: width / 2, y: 50 }, { x: 5, y: 0 });
+    this.paddle    = new Paddle({ x: width / 2, y: 450 }, 60, 15, 2)
     this.play_area = new PlayArea(this.width, this.height)
   }
 
@@ -39,7 +40,11 @@ window.BrickBreaker = (function() {
         this.clearCanvas()
         // Draw the ball in it's new position
         this.drawBall()
+        // Redraw the border. It hasn't moved, but it was removed
+        // from the screen when `clearCanvas` was called
         this.drawBorder()
+        // Draw the paddle
+        this.drawPaddle()
         // Remember the current timestamp, so we can
         // calculate the time between frames
         this.last_draw = now
@@ -54,8 +59,8 @@ window.BrickBreaker = (function() {
     this.ball.move(dt)
   }
 
-  klass.prototype.performCollisions = function(moving_object) {
-    this.performBorderCollisions(moving_object, this.play_area)
+  klass.prototype.performCollisions = function(ball) {
+    this.performBorderCollisions(ball, this.play_area)
   }
 
   klass.prototype.performBorderCollisions = function(ball, container) {
@@ -76,6 +81,10 @@ window.BrickBreaker = (function() {
 
   klass.prototype.drawBorder = function() {
     this.play_area.draw(this.ctx)
+  }
+
+  klass.prototype.drawPaddle = function() {
+    this.paddle.draw(this.ctx)
   }
 
   klass.prototype.clearCanvas = function() {
@@ -216,6 +225,63 @@ window.PlayArea = (function() {
 
   klass.prototype.getRight = function() {
     return this.width
+  }
+
+  return klass
+})()
+
+window.Paddle = (function() {
+  var klass = function Paddle(position, width, height, movement_rate) {
+    this.position      = position
+    this.width         = width
+    this.height        = height
+    this.movement_rate = movement_rate
+  }
+
+  klass.prototype.moveRight = function(right_surface) {
+    this.position += this.movement_rate
+    if (this.getRight() > right_surface) {
+    }
+  }
+
+  klass.prototype.moveLeft = function(left_surface) {
+    this.position -= this.movement_rate
+    if (this.getLeft() < left_surface) {
+      this.position = left_surface + width
+    }
+  }
+
+  klass.prototype.draw = function(context) {
+    context.save()
+    context.fillStyle = '#393'
+    context.strokeStyle = '#171'
+    // Start at the top left, then move clockwise around the rectangle,
+    // and draw a line connecting each corner.
+    context.beginPath()
+    context.moveTo(this.getLeft(), this.getTop())
+    context.lineTo(this.getRight(), this.getTop())
+    context.lineTo(this.getRight(), this.getBottom())
+    context.lineTo(this.getLeft(), this.getBottom())
+    context.closePath()
+    context.fill()
+    context.stroke()
+    context.restore()
+  }
+
+  klass.prototype.getLeft = function() {
+    return this.position.x - this.width / 2
+  }
+
+  klass.prototype.getRight = function() {
+    return this.position.x + this.width / 2
+  }
+
+  klass.prototype.getTop = function() {
+    return this.position.y + this.height / 2
+  }
+
+  klass.prototype.getBottom = function() {
+    return this.position.y - this.height / 2
   }
 
   return klass

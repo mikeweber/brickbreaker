@@ -3,7 +3,7 @@ Simple canvas drawing example
 
 # TODO
 * [x] Add collision detection to edge of window
-* [ ] Add a paddle
+* [x] Add a paddle
   * [ ] Make it moveable with the keyboard
   * [ ] Add collision detection
 * [ ] Add bricks
