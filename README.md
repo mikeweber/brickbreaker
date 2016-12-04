@@ -4,7 +4,7 @@ Simple canvas drawing example
 # TODO
 * [x] Add collision detection to edge of window
 * [x] Add a paddle
-  * [ ] Make it moveable with the keyboard
+  * [x] Make it moveable with the keyboard
   * [ ] Add collision detection
 * [ ] Add bricks
   * [ ] Draw bricks in array

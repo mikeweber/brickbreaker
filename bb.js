@@ -1,13 +1,15 @@
 window.BrickBreaker = (function() {
-  var klass = function BrickBreaker(width, height, canvas) {
-    this.width     = width
-    this.height    = height
+  var klass = function BrickBreaker(width, height, canvas, key_listener) {
+    this.width        = width
+    this.height       = height
     this.setCanvas(canvas)
-    // 60 fps = 1 frame / 60 seconds = 0.016666 seconds = 16 milliseconds
+    this.ball         = new Ball(10, { x: width / 2, y: 50 }, { x: (4 * Math.random() - 2), y: 0 });
+    this.paddle       = new Paddle({ x: width / 2, y: 450 }, 60, 15, 200)
+    this.play_area    = new PlayArea(this.width, this.height)
+    this.key_listener = key_listener
+    // 60 fps to seconds per frame = 1 second / 60 frames = 0.016666 seconds / frame = 16 milliseconds / frame
     this.frame_length = 16
-    this.ball      = new Ball(10, { x: width / 2, y: 50 }, { x: 5, y: 0 });
-    this.paddle    = new Paddle({ x: width / 2, y: 450 }, 60, 15, 2)
-    this.play_area = new PlayArea(this.width, this.height)
+    this.animateScreen()
   }
 
   klass.prototype.setCanvas = function(canvas) {
@@ -17,8 +19,13 @@ window.BrickBreaker = (function() {
     this.canvas.height = this.height
   }
 
+  klass.prototype.togglePaused = function() {
+    this.running = !this.running
+    this.run()
+  }
+
   klass.prototype.run = function() {
-    this.animateScreen()
+    if (this.running) this.animateScreen()
   }
 
   klass.prototype.animateScreen = function() {
@@ -30,6 +37,7 @@ window.BrickBreaker = (function() {
 
       // Move the ball
       this.moveBall(dt * 0.001)
+      this.movePaddle(dt * 0.001)
       // Check to see if the ball has collided with anything,
       // and make it bounce if it has.
       this.performCollisions(this.ball)
@@ -57,6 +65,15 @@ window.BrickBreaker = (function() {
 
   klass.prototype.moveBall = function(dt) {
     this.ball.move(dt)
+  }
+
+  klass.prototype.movePaddle = function(dt) {
+    if (this.key_listener.isActive('ArrowLeft')) {
+      this.paddle.moveLeft(dt, this.play_area.getCollisionLeft())
+    }
+    if (this.key_listener.isActive('ArrowRight')) {
+      this.paddle.moveRight(dt, this.play_area.getCollisionRight())
+    }
   }
 
   klass.prototype.performCollisions = function(ball) {
