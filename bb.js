@@ -10,6 +10,7 @@ window.BrickBreaker = (function() {
     // 60 fps to seconds per frame = 1 second / 60 frames = 0.016666 seconds / frame = 16 milliseconds / frame
     this.frame_length = 16
     this.animateScreen()
+    setTimeout(20, this.animateScreen.bind(this))
   }
 
   klass.prototype.setCanvas = function(canvas) {
@@ -94,25 +95,7 @@ window.BrickBreaker = (function() {
   }
 
   klass.prototype.performBlockCollision = function(ball, block) {
-    var ball_distance = { x: Math.abs(ball.position.x - block.position.x), y: Math.abs(ball.position.y - block.position.y) }
-    // Too far away to possibly interact
-    if (ball_distance.x > (block.width / 2 + ball.radius) || ball_distance.y > (block.height / 2 + ball.radius)) return false
-    // Definitely interacting
-    if (ball_distance.x <= block.width / 2 || ball_distance.y <= block.height / 2) {
-      //if (ball.position.x >= block.getLeft() && block.getRight() >= ball.position.x) {
-        ball.velocity.y *= -1
-        ball.position.y = block.getTop() - block.height / 2
-        ball.velocity.x += (ball.position.x - block.position.x) / (block.width / 2) * 4
-      //}
-      return true
-    }
-
-    // Might be interacting on a corner
-    var corner_distance = (ball_distance.x - block.width / 2) * (ball_distance.x - block.width / 2) + (ball_distance.y - block.height / 2) * (ball_distance.y - block.height / 2)
-
-    if (corner_distance <= ball.radius * ball.radius) {
-      return true
-    }
+    block.collide(ball)
   }
 
   klass.prototype.drawBall = function() {

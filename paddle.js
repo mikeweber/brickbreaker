@@ -38,6 +38,28 @@ window.Paddle = (function() {
     context.restore()
   }
 
+  klass.prototype.collide = function(ball) {
+    var ball_distance = { x: Math.abs(ball.position.x - this.position.x), y: Math.abs(ball.position.y - this.position.y) }
+    // Too far away to possibly interact
+    if (ball_distance.x > (this.width / 2 + ball.radius) || ball_distance.y > (this.height / 2 + ball.radius)) return false
+    // Definitely interacting
+    if (ball_distance.x <= this.width / 2 || ball_distance.y <= this.height / 2) {
+      //if (ball.position.x >= this.getLeft() && this.getRight() >= ball.position.x) {
+        ball.velocity.y *= -1
+        ball.position.y = this.getTop() - this.height / 2
+        ball.velocity.x += (ball.position.x - this.position.x) / (this.width / 2) * 4
+      //}
+      return true
+    }
+
+    // Might be interacting on a corner
+    var corner_distance = (ball_distance.x - this.width / 2) * (ball_distance.x - this.width / 2) + (ball_distance.y - this.height / 2) * (ball_distance.y - this.height / 2)
+
+    if (corner_distance <= ball.radius * ball.radius) {
+      return true
+    }
+  }
+
   klass.prototype.getLeft = function() {
     return this.position.x - this.width / 2
   }
