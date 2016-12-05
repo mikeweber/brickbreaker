@@ -4,7 +4,7 @@ window.BrickBreaker = (function() {
     this.height       = height
     this.setCanvas(canvas)
     this.ball         = new Ball(10, { x: width / 2, y: 50 }, { x: (4 * Math.random() - 2), y: 0 });
-    this.paddle       = new Paddle({ x: width / 2, y: 450 }, 60, 15, 200)
+    this.paddle       = new Paddle({ x: width / 2, y: 450 }, 60, 15, 300)
     this.play_area    = new PlayArea(this.width, this.height)
     this.key_listener = key_listener
     // 60 fps to seconds per frame = 1 second / 60 frames = 0.016666 seconds / frame = 16 milliseconds / frame
@@ -78,6 +78,7 @@ window.BrickBreaker = (function() {
 
   klass.prototype.performCollisions = function(ball) {
     this.performBorderCollisions(ball, this.play_area)
+    this.performBlockCollision(ball, this.paddle)
   }
 
   klass.prototype.performBorderCollisions = function(ball, container) {
@@ -89,6 +90,28 @@ window.BrickBreaker = (function() {
       ball.bounceRight(container.getCollisionLeft())
     } else if (ball.getRight() > container.getCollisionRight()) {
       ball.bounceLeft(container.getCollisionRight())
+    }
+  }
+
+  klass.prototype.performBlockCollision = function(ball, block) {
+    var ball_distance = { x: Math.abs(ball.position.x - block.position.x), y: Math.abs(ball.position.y - block.position.y) }
+    // Too far away to possibly interact
+    if (ball_distance.x > (block.width / 2 + ball.radius) || ball_distance.y > (block.height / 2 + ball.radius)) return false
+    // Definitely interacting
+    if (ball_distance.x <= block.width / 2 || ball_distance.y <= block.height / 2) {
+      //if (ball.position.x >= block.getLeft() && block.getRight() >= ball.position.x) {
+        ball.velocity.y *= -1
+        ball.position.y = block.getTop() - block.height / 2
+        ball.velocity.x += (ball.position.x - block.position.x) / (block.width / 2) * 4
+      //}
+      return true
+    }
+
+    // Might be interacting on a corner
+    var corner_distance = (ball_distance.x - block.width / 2) * (ball_distance.x - block.width / 2) + (ball_distance.y - block.height / 2) * (ball_distance.y - block.height / 2)
+
+    if (corner_distance <= ball.radius * ball.radius) {
+      return true
     }
   }
 
