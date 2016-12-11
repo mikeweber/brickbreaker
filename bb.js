@@ -3,8 +3,6 @@ window.BrickBreaker = (function() {
     this.width        = width
     this.height       = height
     this.setCanvas(canvas)
-    this.ball         = new Ball(10, { x: width / 2, y: 200 }, { x: (4 * Math.random() - 2), y: 5 });
-    this.paddle       = new Paddle({ x: width / 2, y: 450 }, 60, 15, 300)
     this.play_area    = new PlayArea(this.width, this.height)
     this.key_listener = key_listener
     // 60 fps to seconds per frame = 1 second / 60 frames = 0.016666 seconds / frame = 16 milliseconds / frame
@@ -15,6 +13,7 @@ window.BrickBreaker = (function() {
 
   klass.prototype.setup = function() {
     this.pause()
+    this.reset()
     this.lives  = 3
     this.bricks = []
     this.bricks.push(new Brick({ x: 40, y: 50 }, 60, 15))
@@ -25,6 +24,11 @@ window.BrickBreaker = (function() {
     }
   }
 
+  klass.prototype.reset = function() {
+    this.ball   = new Ball(10, { x: this.width / 2, y: 200 }, { x: (4 * Math.random() - 2), y: 5 });
+    this.paddle = new Paddle({ x: this.width / 2, y: 450 }, 60, 15, 300)
+  }
+
   klass.prototype.setCanvas = function(canvas) {
     this.canvas        = canvas
     this.ctx           = canvas.getContext('2d')
@@ -33,7 +37,16 @@ window.BrickBreaker = (function() {
   }
 
   klass.prototype.togglePaused = function() {
+    if (this.frozen) {
+      this.frozen = false
+      this.reset()
+    }
     this.running ? this.pause() : this.unpause()
+  }
+
+  klass.prototype.freeze = function() {
+    this.running = false
+    this.frozen  = true
   }
 
   klass.prototype.pause = function() {
@@ -152,12 +165,17 @@ window.BrickBreaker = (function() {
     if (ball.getTop() < container.getCollisionTop()) {
       ball.bounceDown(container.getCollisionTop())
     } else if (ball.getBottom() > container.getCollisionBottom()) {
-      ball.bounceUp(container.getCollisionBottom())
+      this.loseLife()
     } else if (ball.getLeft() < container.getCollisionLeft()) {
       ball.bounceRight(container.getCollisionLeft())
     } else if (ball.getRight() > container.getCollisionRight()) {
       ball.bounceLeft(container.getCollisionRight())
     }
+  }
+
+  klass.prototype.loseLife = function() {
+    this.lives--
+    this.freeze()
   }
 
   klass.prototype.performBlockCollision = function(ball, block) {
@@ -183,6 +201,10 @@ window.BrickBreaker = (function() {
   }
 
   klass.prototype.drawMessages = function() {
+    this.ctx.textAlign = 'left'
+    this.ctx.fillStyle = '#FFF'
+    this.ctx.font = '10pt Monaco'
+    this.ctx.fillText('Lives: ' + this.lives, 5, 25)
     if (this.primary_message) {
       this.ctx.textAlign = 'center'
       this.ctx.fillStyle = '#FFF'

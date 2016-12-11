@@ -12,5 +12,5 @@ Simple canvas drawing example
   * [x] Remove damaged bricks
 * [x] Add messages to UI
   * [x] Add "Paused"
-  * [ ] Add "Game over"
+  * [x] Add "Game over"
   * [x] Add "You win!"
