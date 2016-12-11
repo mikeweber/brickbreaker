@@ -24,7 +24,7 @@ window.Brick = (function() {
   }
 
   klass.prototype.getColor = function() {
-    return [null, '#393', '#272', '#161'][this.lives]
+    return ['#a51', '#c72', '#e93'][this.lives - 1]
   }
 
   klass.prototype.collide = function(ball) {

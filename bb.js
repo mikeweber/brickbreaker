@@ -11,11 +11,13 @@ window.BrickBreaker = (function() {
     this.frame_length = 16
     this.setup()
     this.animateScreen()
-    setTimeout(20, this.animateScreen.bind(this))
   }
 
   klass.prototype.setup = function() {
+    this.pause()
+    this.lives  = 3
     this.bricks = []
+    this.bricks.push(new Brick({ x: 40, y: 50 }, 60, 15))
     for (var i = 0; i < 7; i++) {
       for (var j = 0; j < 4; j++) {
         this.bricks.push(new Brick({ x: 40 + i * 70, y: 50 + j * 20 }, 60, 15))
@@ -24,19 +26,28 @@ window.BrickBreaker = (function() {
   }
 
   klass.prototype.setCanvas = function(canvas) {
-    this.canvas = canvas
-    this.ctx    = canvas.getContext('2d')
+    this.canvas        = canvas
+    this.ctx           = canvas.getContext('2d')
     this.canvas.width  = this.width
     this.canvas.height = this.height
   }
 
   klass.prototype.togglePaused = function() {
-    this.running = !this.running
-    this.run()
+    this.running ? this.pause() : this.unpause()
   }
 
-  klass.prototype.run = function() {
-    if (this.running) this.animateScreen()
+  klass.prototype.pause = function() {
+    this.running           = false
+    this.primary_message   = 'PAUSED'
+    this.secondary_message = 'Press Space to start'
+  }
+
+  klass.prototype.unpause = function() {
+    if (this.isGameOver()) return
+
+    this.running           = true
+    this.primary_message   = null
+    this.secondary_message = null
   }
 
   klass.prototype.animateScreen = function() {
@@ -46,13 +57,17 @@ window.BrickBreaker = (function() {
       var now = new Date(),
           dt  = now - this.last_draw
 
-      // Move the ball
-      this.moveBall(dt * 0.001)
-      this.movePaddle(dt * 0.001)
-      // Check to see if the ball has collided with anything,
-      // and make it bounce if it has.
-      this.performCollisions(this.ball)
-      this.removeDeadBricks()
+      if (this.running) {
+        // Move the ball
+        this.moveBall(dt * 0.001)
+        this.movePaddle(dt * 0.001)
+        // Check to see if the ball has collided with anything,
+        // and make it bounce if it has.
+
+        this.performCollisions(this.ball)
+        this.removeDeadBricks()
+        this.endGame()
+      }
 
       // Wait to draw until frame_length milliseconds have passed
       if (dt > this.frame_length) {
@@ -67,12 +82,14 @@ window.BrickBreaker = (function() {
         this.drawPaddle()
         // Draw the bricks
         this.drawBricks()
+        // Draw any messages
+        this.drawMessages()
         // Remember the current timestamp, so we can
         // calculate the time between frames
         this.last_draw = now
       }
 
-      if (this.running) requestAnimationFrame(render.bind(this))
+      requestAnimationFrame(render.bind(this))
     }
     requestAnimationFrame(render.bind(this))
   }
@@ -106,6 +123,31 @@ window.BrickBreaker = (function() {
     }
   }
 
+  klass.prototype.endGame = function() {
+    if (!this.isGameOver()) return
+
+    if (this.isGameWon()) {
+      this.primary_message = "You Win!"
+    }
+    if (this.isGameLost()) {
+      this.primary_message = "Game Over"
+      this.secondary_message = "you lose"
+    }
+    this.running = false
+  }
+
+  klass.prototype.isGameOver = function() {
+    return this.isGameWon() || this.isGameLost()
+  }
+
+  klass.prototype.isGameWon = function() {
+    return this.bricks.length == 0
+  }
+
+  klass.prototype.isGameLost = function() {
+    return this.lives == 0
+  }
+
   klass.prototype.performBorderCollisions = function(ball, container) {
     if (ball.getTop() < container.getCollisionTop()) {
       ball.bounceDown(container.getCollisionTop())
@@ -137,6 +179,22 @@ window.BrickBreaker = (function() {
   klass.prototype.drawBricks = function() {
     for (var i = this.bricks.length; i--; ) {
       this.bricks[i].draw(this.ctx)
+    }
+  }
+
+  klass.prototype.drawMessages = function() {
+    if (this.primary_message) {
+      this.ctx.textAlign = 'center'
+      this.ctx.fillStyle = '#FFF'
+      this.ctx.font = '50pt Monaco'
+      this.ctx.fillText(this.primary_message, 250, 250)
+    }
+
+    if (this.secondary_message) {
+      this.ctx.textAlign = 'center'
+      this.ctx.fillStyle = '#FFF'
+      this.ctx.font = '30pt Monaco'
+      this.ctx.fillText(this.secondary_message, 250, 300)
     }
   }
 
