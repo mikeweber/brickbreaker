@@ -3,7 +3,7 @@ window.BrickBreaker = (function() {
     this.width        = width
     this.height       = height
     this.setCanvas(canvas)
-    this.ball         = new Ball(10, { x: width / 2, y: 200 }, { x: (4 * Math.random() - 2), y: 0 });
+    this.ball         = new Ball(10, { x: width / 2, y: 200 }, { x: (4 * Math.random() - 2), y: 5 });
     this.paddle       = new Paddle({ x: width / 2, y: 450 }, 60, 15, 300)
     this.play_area    = new PlayArea(this.width, this.height)
     this.key_listener = key_listener

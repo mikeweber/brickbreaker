@@ -7,7 +7,6 @@ window.Ball = (function() {
 
   klass.prototype.move = function(dt) {
     // To move the ball "down" the screen, increae the y position
-    this.velocity.y += this.getGravity() * dt
     this.position.y += this.velocity.y
     this.position.x += this.velocity.x
   }
@@ -68,10 +67,7 @@ window.Ball = (function() {
 
   klass.prototype.bounceYAxis = function() {
     this.velocity.x *= 0.99
-    this.velocity.y *= -1.03
-    if (this.velocity.y >= 10) {
-      this.velocity.y = 10
-    }
+    this.velocity.y *= -1
   }
 
   return klass
