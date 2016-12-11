@@ -9,4 +9,8 @@ Simple canvas drawing example
 * [x] Add bricks
   * [x] Draw bricks in array
   * [x] Add collision detection
-  * [ ] Remove damaged bricks
+  * [x] Remove damaged bricks
+* [ ] Add messages to UI
+  * [ ] Add "Paused"
+  * [ ] Add "Game over"
+  * [ ] Add "You win!"

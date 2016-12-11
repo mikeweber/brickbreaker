@@ -29,5 +29,15 @@ window.Paddle = (function() {
     }
   }
 
+  klass.prototype.getColor = function() {
+    return '#393'
+  }
+
+  klass.prototype.isAlive = function() {
+    return true
+  }
+
+  klass.prototype.hit = function() {}
+
   return klass
 })()

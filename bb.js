@@ -52,6 +52,7 @@ window.BrickBreaker = (function() {
       // Check to see if the ball has collided with anything,
       // and make it bounce if it has.
       this.performCollisions(this.ball)
+      this.removeDeadBricks()
 
       // Wait to draw until frame_length milliseconds have passed
       if (dt > this.frame_length) {
@@ -94,6 +95,14 @@ window.BrickBreaker = (function() {
     this.performBlockCollision(ball, this.paddle)
     for (var i = this.bricks.length; i--; ) {
       this.performBlockCollision(ball, this.bricks[i])
+    }
+  }
+
+  klass.prototype.removeDeadBricks = function() {
+    for (var i = this.bricks.length; i--; ) {
+      if (!this.bricks[i].isAlive()) {
+        this.bricks.splice(i, 1)
+      }
     }
   }
 

@@ -3,11 +3,12 @@ window.Brick = (function() {
     this.position      = position
     this.width         = width
     this.height        = height
+    this.lives         = 3
   }
 
   klass.prototype.draw = function(context) {
     context.save()
-    context.fillStyle   = '#393'
+    context.fillStyle   = this.getColor()
     context.strokeStyle = '#171'
     // Start at the top left, then move clockwise around the rectangle,
     // and draw a line connecting each corner.
@@ -22,7 +23,20 @@ window.Brick = (function() {
     context.restore()
   }
 
+  klass.prototype.getColor = function() {
+    return [null, '#393', '#272', '#161'][this.lives]
+  }
+
   klass.prototype.collide = function(ball) {
+    if (this.hasCollided(ball)) {
+      this.hit()
+      return true
+    } else {
+      return false
+    }
+  }
+
+  klass.prototype.hasCollided = function(ball) {
     var ball_distance = { x: Math.abs(ball.position.x - this.position.x), y: Math.abs(ball.position.y - this.position.y) }
     // Too far away to possibly interact
     if (ball_distance.x > (this.width / 2 + ball.radius) || ball_distance.y > (this.height / 2 + ball.radius)) return false
@@ -53,9 +67,15 @@ window.Brick = (function() {
     // expensive check, so save it for last.
     var corner_distance = (ball_distance.x - this.width / 2) * (ball_distance.x - this.width / 2) + (ball_distance.y - this.height / 2) * (ball_distance.y - this.height / 2)
 
-    if (corner_distance <= ball.radius * ball.radius) {
-      return true
-    }
+    return (corner_distance <= ball.radius * ball.radius)
+  }
+
+  klass.prototype.hit = function() {
+    this.lives--
+  }
+
+  klass.prototype.isAlive = function() {
+    return this.lives > 0
   }
 
   klass.prototype.getLeft = function() {
