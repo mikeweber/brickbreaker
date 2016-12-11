@@ -22,5 +22,12 @@ window.Paddle = (function() {
     }
   }
 
+  klass.prototype.collide = function(ball) {
+    if (Brick.prototype.collide.call(this, ball)) {
+      // Bounce the ball slightly left or right based on how far the ball hit from the center
+      ball.velocity.x += (ball.position.x - this.position.x) / (this.width / 2) * 4
+    }
+  }
+
   return klass
 })()

@@ -68,7 +68,10 @@ window.Ball = (function() {
 
   klass.prototype.bounceYAxis = function() {
     this.velocity.x *= 0.99
-    this.velocity.y *= -0.9
+    this.velocity.y *= -1.03
+    if (this.velocity.y >= 10) {
+      this.velocity.y = 10
+    }
   }
 
   return klass

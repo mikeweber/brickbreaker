@@ -3,14 +3,24 @@ window.BrickBreaker = (function() {
     this.width        = width
     this.height       = height
     this.setCanvas(canvas)
-    this.ball         = new Ball(10, { x: width / 2, y: 50 }, { x: (4 * Math.random() - 2), y: 0 });
+    this.ball         = new Ball(10, { x: width / 2, y: 200 }, { x: (4 * Math.random() - 2), y: 0 });
     this.paddle       = new Paddle({ x: width / 2, y: 450 }, 60, 15, 300)
     this.play_area    = new PlayArea(this.width, this.height)
     this.key_listener = key_listener
     // 60 fps to seconds per frame = 1 second / 60 frames = 0.016666 seconds / frame = 16 milliseconds / frame
     this.frame_length = 16
+    this.setup()
     this.animateScreen()
     setTimeout(20, this.animateScreen.bind(this))
+  }
+
+  klass.prototype.setup = function() {
+    this.bricks = []
+    for (var i = 0; i < 7; i++) {
+      for (var j = 0; j < 4; j++) {
+        this.bricks.push(new Brick({ x: 40 + i * 70, y: 50 + j * 20 }, 60, 15))
+      }
+    }
   }
 
   klass.prototype.setCanvas = function(canvas) {
@@ -54,6 +64,8 @@ window.BrickBreaker = (function() {
         this.drawBorder()
         // Draw the paddle
         this.drawPaddle()
+        // Draw the bricks
+        this.drawBricks()
         // Remember the current timestamp, so we can
         // calculate the time between frames
         this.last_draw = now
@@ -80,6 +92,9 @@ window.BrickBreaker = (function() {
   klass.prototype.performCollisions = function(ball) {
     this.performBorderCollisions(ball, this.play_area)
     this.performBlockCollision(ball, this.paddle)
+    for (var i = this.bricks.length; i--; ) {
+      this.performBlockCollision(ball, this.bricks[i])
+    }
   }
 
   klass.prototype.performBorderCollisions = function(ball, container) {
@@ -108,6 +123,12 @@ window.BrickBreaker = (function() {
 
   klass.prototype.drawPaddle = function() {
     this.paddle.draw(this.ctx)
+  }
+
+  klass.prototype.drawBricks = function() {
+    for (var i = this.bricks.length; i--; ) {
+      this.bricks[i].draw(this.ctx)
+    }
   }
 
   klass.prototype.clearCanvas = function() {
