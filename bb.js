@@ -16,7 +16,6 @@ window.BrickBreaker = (function() {
     this.reset()
     this.lives  = 3
     this.bricks = []
-    this.bricks.push(new Brick({ x: 40, y: 50 }, 60, 15))
     for (var i = 0; i < 7; i++) {
       for (var j = 0; j < 4; j++) {
         this.bricks.push(new Brick({ x: 40 + i * 70, y: 50 + j * 20 }, 60, 15))
