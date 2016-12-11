@@ -67,7 +67,18 @@ window.Brick = (function() {
     // expensive check, so save it for last.
     var corner_distance = (ball_distance.x - this.width / 2) * (ball_distance.x - this.width / 2) + (ball_distance.y - this.height / 2) * (ball_distance.y - this.height / 2)
 
-    return (corner_distance <= ball.radius * ball.radius)
+    if (corner_distance <= ball.radius * ball.radius) {
+      var corner_x = (ball.position.x > this.position.x) ? this.position.x + this.width / 2 : this.position.x - this.width / 2
+      var corner_y = (ball.position.y < this.position.y) ? this.position.y + this.height / 2 : this.position.y - this.height / 2
+      var x = ball.position.x - corner_x
+      var y = ball.position.y - corner_y
+      var c = -2 * (ball.velocity.x * x + ball.velocity.y * y) / (x * x + y * y)
+      ball.velocity.x += c * x
+      ball.velocity.y += c * y
+      return true
+    } else {
+      return false
+    }
   }
 
   klass.prototype.hit = function() {
