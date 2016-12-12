@@ -70,40 +70,37 @@ window.BrickBreaker = (function() {
           dt  = now - this.last_draw
 
       if (this.running) {
-        // Move the ball
-        this.moveBall(dt * 0.001)
         this.movePaddle(dt * 0.001)
-        // Check to see if the ball has collided with anything,
-        // and make it bounce if it has.
-
         this.performCollisions(this.ball)
+        this.moveBall(dt * 0.001)
         this.removeDeadBricks()
         this.endGame()
       }
 
-      // Wait to draw until frame_length milliseconds have passed
       if (dt > this.frame_length) {
-        // Clear the canvas
-        this.clearCanvas()
-        // Draw the ball in it's new position
-        this.drawBall()
-        // Redraw the border. It hasn't moved, but it was removed
-        // from the screen when `clearCanvas` was called
-        this.drawBorder()
-        // Draw the paddle
-        this.drawPaddle()
-        // Draw the bricks
-        this.drawBricks()
-        // Draw any messages
-        this.drawMessages()
-        // Remember the current timestamp, so we can
-        // calculate the time between frames
         this.last_draw = now
+        this.draw()
       }
 
       requestAnimationFrame(render.bind(this))
     }
     requestAnimationFrame(render.bind(this))
+  }
+
+  klass.prototype.draw = function(debug) {
+    // Clear the canvas
+    this.clearCanvas()
+    // Draw the ball in it's new position
+    this.drawBall()
+    // Redraw the border. It hasn't moved, but it was removed
+    // from the screen when `clearCanvas` was called
+    this.drawBorder()
+    // Draw the paddle
+    this.drawPaddle()
+    // Draw the bricks
+    this.drawBricks()
+    // Draw any messages
+    this.drawMessages(this.ball)
   }
 
   klass.prototype.moveBall = function(dt) {
@@ -174,6 +171,7 @@ window.BrickBreaker = (function() {
 
   klass.prototype.loseLife = function() {
     this.lives--
+    this.secondary_message = 'Press space'
     this.freeze()
   }
 
@@ -199,24 +197,43 @@ window.BrickBreaker = (function() {
     }
   }
 
-  klass.prototype.drawMessages = function() {
+  klass.prototype.drawMessages = function(ball) {
+    this.showLives()
+    this.showPrimaryMessage()
+    this.showSecondaryMessage()
+    this.showVelocity(ball)
+  }
+
+  klass.prototype.showLives = function() {
     this.ctx.textAlign = 'left'
     this.ctx.fillStyle = '#FFF'
     this.ctx.font = '10pt Monaco'
     this.ctx.fillText('Lives: ' + this.lives, 5, 25)
-    if (this.primary_message) {
-      this.ctx.textAlign = 'center'
-      this.ctx.fillStyle = '#FFF'
-      this.ctx.font = '50pt Monaco'
-      this.ctx.fillText(this.primary_message, 250, 250)
-    }
+  }
 
-    if (this.secondary_message) {
-      this.ctx.textAlign = 'center'
-      this.ctx.fillStyle = '#FFF'
-      this.ctx.font = '30pt Monaco'
-      this.ctx.fillText(this.secondary_message, 250, 300)
-    }
+  klass.prototype.showPrimaryMessage = function() {
+    if (!this.primary_message) return
+
+    this.ctx.textAlign = 'center'
+    this.ctx.fillStyle = '#FFF'
+    this.ctx.font = '50pt Monaco'
+    this.ctx.fillText(this.primary_message, 250, 250)
+  }
+
+  klass.prototype.showSecondaryMessage = function() {
+    if (!this.secondary_message) return
+
+    this.ctx.textAlign = 'center'
+    this.ctx.fillStyle = '#FFF'
+    this.ctx.font = '30pt Monaco'
+    this.ctx.fillText(this.secondary_message, 250, 300)
+  }
+
+  klass.prototype.showVelocity = function(ball) {
+    this.ctx.textAlign = 'right'
+    this.ctx.fillStyle = '#FFF'
+    this.ctx.font = '10pt Monaco'
+    this.ctx.fillText((ball.getVelocity()).toFixed(2) + ' (x: ' + ball.velocity.x.toFixed(2) + ', y: ' + ball.velocity.y.toFixed(2) + ')', 425, 25)
   }
 
   klass.prototype.clearCanvas = function() {

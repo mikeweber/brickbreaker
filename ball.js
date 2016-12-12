@@ -1,6 +1,7 @@
 window.Ball = (function() {
   var klass = function Ball(radius, position, velocity) {
     this.radius     = radius
+    this.radius_sq  = radius * radius
     this.position   = position
     this.velocity   = velocity
   }
@@ -21,8 +22,8 @@ window.Ball = (function() {
     context.restore()
   }
 
-  klass.prototype.getGravity = function() {
-    return 9.8
+  klass.prototype.getVelocity = function() {
+    return Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y)
   }
 
   klass.prototype.getTop = function() {
@@ -62,11 +63,10 @@ window.Ball = (function() {
   }
 
   klass.prototype.bounceXAxis = function() {
-    this.velocity.x *= -0.5
+    this.velocity.x *= -1
   }
 
   klass.prototype.bounceYAxis = function() {
-    this.velocity.x *= 0.99
     this.velocity.y *= -1
   }
 
